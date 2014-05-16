@@ -1,0 +1,103 @@
+{% load staticfiles %}
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Post list</title>
+
+	<link rel="stylesheet" href="{% static 'blog/css/bootstrap.min.css' %}">
+	<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
+</head>
+<body>
+	
+	<div class="blog-masthead">
+		<div class="container">
+			<nav class="blog-nav">
+			<div class="row">
+				<div class="col-md-4 col-md-offset-8">
+					{% if not user.is_authenticated %}
+						<a class="blog-nav-item" href="{% url 'blog:login' %}">Login</a>
+					{% else %}
+						<span class="blog-nav-item active">{{ user.username }}</span>
+						<a class="blog-nav-item" href="{% url 'blog:logout' %}">Logout</a>
+					{% endif %}			
+				</div>
+			</div>
+			</nav>
+		</div>
+	</div>
+
+	{% block main_content %}
+	<div class="container">
+			
+			<div class="row">
+				<div class="col-md-8 blog-main">
+					<div class="blog-post">
+						{% if perms.blog.add_post %}
+							{% block create_post_form %}
+								<form action="{% url 'blog:post_add' %}" method="POST" role="form">
+									<fieldset>
+										<legend>Создать новый пост</legend>
+										{% csrf_token %} 
+										<div class="form-group">
+											<label class="control-label" for="title">Заголовок: </label>
+											<input type="text" id="title" name="title" placeholder="Заголовок" required="" class="form-control">
+										</div>
+										
+										<div class="form-group">
+											<label class="control-label" for="content">Пост: </label>
+											<textarea type="text" rows="3" id="content" name="content" placeholder="Контент" required="" class="form-control"></textarea>
+										</div>
+															
+										<input class="btn btn-default" type="submit">
+									</fieldset>
+								</form>
+							
+								<script src="{% static 'blog/js/jquery.form.min.js' %}"></script>
+								<script src="{% static 'blog/js/myscript.js' %}"></script>
+							{% endblock %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		
+		{% if latest_posts_list %}
+
+			{% for post in latest_posts_list %}
+				<div class="row">
+					<div class="col-md-8 blog-main">
+						<div class="blog-post">
+							<h2 class="blog-post-title"><a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a></h2>
+							<p class="blog-post-meta">{{ post.pub_date|date:"d.m.Y h:m" }}</p>
+							<p>{{ post.content }}</p>
+						</div>
+					</div>			
+				</div>
+			{% endfor %}
+			
+			<div class="pagination">
+				<span class="step-links">
+				{% if page_obj.has_previous %}
+					<a href="?page={{ page_obj.previous_page_number }}">previous</a>
+				{% endif %}
+					<span class="current">
+					Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+					</span>
+				{% if page_obj.has_next %}
+					<a href="?page={{ page_obj.next_page_number }}">next</a>
+				{% endif %}
+				</span>
+			</div>
+
+		{% else %}
+			<p>No posts are available.</p>
+		{% endif %}
+
+	</div>
+	{% endblock %}
+
+<script src="{% static 'blog/js/jquery-2.1.1.js' %}"></script>
+<script src="{% static 'blog/js/bootstrap.min.js' %}"></script>
+</body>
+</html>

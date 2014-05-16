@@ -1,0 +1,73 @@
+{% extends "blog/post_list.html" %}
+
+{% load staticfiles %}
+
+{% block main_content %}
+
+	<div class="row">
+		<div class="col-md-8 blog-main">
+			<div class="blog-post"></div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 blog-main">
+				<div class="blog-post">
+					<h2 class="blog-post-title">{{ post.title }}</h2>
+					<p class="blog-post-meta">{{ post.pub_date }}</p>
+					<p>{{ post.content }}</p>
+				</div>
+			</div>			
+		</div>
+		
+		{% if post.comment_set.count > 0 %}
+			<div class="row">
+				<div class="col-md-8 blog-main">
+					<h4>Комментарии:</h4>
+				</div>			
+			</div>
+			{% for comment in post.comment_set.all %}
+				<div class="row">
+					<div class="col-md-8 blog-comment">
+						<p>{{ comment.content }} <br> 
+						
+						<span class="comment-meta">
+							<span class="comment-author">{{ comment.user.username }}</span>
+							<span class="comment-date">{{ comment.pub_date|date:"d.m.Y h:m" }}</span>
+						</span>
+					</div>			
+				</div>
+			{% endfor %}
+		{% endif %}
+		
+		{% if perms.blog.add_comment %}
+			<div class="row">
+				<div class="col-md-8 blog-comment">
+					<form action="{% url 'blog:comment_add' %}" method="POST" role="form">
+						<fieldset>
+							<legend>Добавить комментарий:</legend>
+							{% csrf_token %}
+							<div class="form-group">
+								<!-- <label class="control-label" for="content">Пост: </label> -->
+								<textarea type="text" rows="3" id="content" name="content" placeholder="Контент" required="" class="form-control"></textarea>
+							</div>
+
+							<input type="hidden" name="post" value="{{ post.id }}">
+							<input class="btn btn-default" type="submit">
+						</fieldset>
+					</form>
+				</div>
+			</div>
+		{% else %}
+			<div class="row">
+				<div class="col-md-8 blog-comment">
+					<a href="{% url 'blog:login' %}">Войдите</a> или <a href="{% url 'blog:register' %}">зарегистрируйтесь</a> чтобы оставлять комментарии
+					<br><br>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+{% endblock %}
+
+

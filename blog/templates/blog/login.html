@@ -1,0 +1,47 @@
+{% extends "blog/post_list.html" %}
+
+{% load staticfiles %}
+
+{% block main_content %}
+	
+<div class="container">
+	<div class="row">
+
+		<div class="col-md-8 blog-main">
+			{% if form.errors %}
+				<br>
+				<p>Your username and password didn't match. Please try again.</p>
+			{% endif %}
+		</div>
+
+		<div class="col-md-8 blog-main">
+			<form action="{% url 'blog:login' %}" method="POST" role="form" class="form-horizontal">
+				<fieldset>
+					<legend>Вход:</legend>
+					{% csrf_token %}
+						<div class="form-group">
+							<label for="username" class="col-sm-4 control-label">Username:</label>
+							<div class="col-sm-6">
+								<input class="form-control" id="username" placeholder="Username" name="username" 
+								value="{{ form.username.value|default:'' }}">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="inputPassword" class="col-sm-4 control-label">Password:</label>
+							<div class="col-sm-6">
+								<input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password"
+								value="{{ form.password.value|default:'' }}">
+							</div>
+						</div>
+
+						<input type="hidden" name="next" value="{{ next }}" />
+						<input class="btn btn-default" type="submit" value="Войти">
+				</fieldset>
+			</form>
+		</div>
+
+	</div>
+</div>
+{% endblock %}
+
